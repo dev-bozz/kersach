@@ -36,11 +36,10 @@ public sealed class CalculatorViewModel : INotifyPropertyChanged
     public string ModeLabel { get => _modeLabel; private set => Set(ref _modeLabel, value); }
     public string AngleLabel { get => _angleLabel; private set => Set(ref _angleLabel, value); }
     public ObservableCollection<CalculationRecord> History { get; } = [];
-    public IReadOnlyList<string> Rows => ["sin", "cos", "tan", "ln", "log10", "√x", "x²", "xʸ", "1/x", "(", ")", "π", "e", "±", "%", "CE", "C", "⌫", "÷", "7", "8", "9", "×", "4", "5", "6", "−", "1", "2", "3", "+", "0", ",", "="];
-    public IReadOnlyList<string> StandardRows => ["±", "%", "CE", "⌫", "7", "8", "9", "÷", "4", "5", "6", "×", "1", "2", "3", "−", "0", ",", "C", "+", "="];
-    public IReadOnlyList<string> ScientificRows => Rows;
+    public IReadOnlyList<string> ScientificFunctions => ["sin", "cos", "tan", "ln", "log10", "√x", "x²", "xʸ", "1/x", "(", ")", "π", "e"];
+    public IReadOnlyList<string> KeypadRows => ["CE", "C", "⌫", "÷", "7", "8", "9", "×", "4", "5", "6", "−", "1", "2", "3", "+", "±", "0", ",", "="];
+    public bool ShowScientific => _state.CalculatorMode == CalculatorMode.Scientific;
     public string AngleButtonLabel => _state.AngleMode == AngleMode.Degrees ? "DEG  ▾" : "RAD  ▾";
-    public IReadOnlyList<string> CurrentRows => _state.CalculatorMode == CalculatorMode.Standard ? StandardRows : ScientificRows;
     public CalculatorViewModel(CalculatorModel model, CalculatorController controller, IOperationFactory factory, IHistoryStore store)
     {
         _model = model; _controller = controller; _factory = factory; _store = store;
@@ -125,7 +124,7 @@ public sealed class CalculatorViewModel : INotifyPropertyChanged
     private void ApplyPercent() { var value = ParseInput() / 100d; _input = Format(value); SyncDisplay(); }
     private void ExpressionInput(string text) { _state.Expression += text; _input = text is "π" or "e" ? Format(text == "π" ? Math.PI : Math.E) : _input; _state.IsNewEntry = true; Publish(); }
     private void Clear() { _input = "0"; _state.Display = "0"; _state.Expression = ""; _state.PendingOperator = null; _state.LeftOperand = null; _state.IsNewEntry = true; _lastOperator = null; _lastRight = null; Publish(); }
-    private void SwitchMode() { _state.CalculatorMode = _state.CalculatorMode == CalculatorMode.Standard ? CalculatorMode.Scientific : CalculatorMode.Standard; _controller.SwitchEngine(_state.CalculatorMode == CalculatorMode.Standard ? new StandardEngine(_factory) : new ScientificEngine(_factory)); PropertyChanged?.Invoke(this, new(nameof(CurrentRows))); Publish(); }
+    private void SwitchMode() { _state.CalculatorMode = _state.CalculatorMode == CalculatorMode.Standard ? CalculatorMode.Scientific : CalculatorMode.Standard; _controller.SwitchEngine(_state.CalculatorMode == CalculatorMode.Standard ? new StandardEngine(_factory) : new ScientificEngine(_factory)); PropertyChanged?.Invoke(this, new(nameof(ShowScientific))); Publish(); }
     private void Undo() { var memento = _caretaker.Undo(_state.Save()); if (memento is not null) { _state.Restore(memento); _input = _state.Input; RestoreEngine(); Publish(); } }
     private void Redo() { var memento = _caretaker.Redo(_state.Save()); if (memento is not null) { _state.Restore(memento); _input = _state.Input; RestoreEngine(); Publish(); } }
     private void RestoreEngine() => _controller.SwitchEngine(_state.CalculatorMode == CalculatorMode.Standard ? new StandardEngine(_factory) : new ScientificEngine(_factory));

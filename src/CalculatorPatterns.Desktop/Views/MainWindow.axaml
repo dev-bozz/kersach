@@ -1,6 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="CalculatorPatterns.Desktop.Views.MainWindow" Title="Калькулятор" Width="1120" Height="760" MinWidth="950" MinHeight="650" Background="#F4F6FA">
   <Window.Styles>
-    <Style Selector="Button.key"><Setter Property="Height" Value="54"/><Setter Property="Margin" Value="4"/><Setter Property="CornerRadius" Value="13"/><Setter Property="FontSize" Value="17"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Background" Value="#F0F3F8"/><Setter Property="Foreground" Value="#29364D"/><Setter Property="BorderThickness" Value="0"/><Setter Property="Padding" Value="8"/></Style>
+    <Style Selector="Button.key"><Setter Property="MinHeight" Value="48"/><Setter Property="Margin" Value="4"/><Setter Property="CornerRadius" Value="13"/><Setter Property="FontSize" Value="17"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Background" Value="#F0F3F8"/><Setter Property="Foreground" Value="#29364D"/><Setter Property="BorderThickness" Value="0"/><Setter Property="Padding" Value="8"/><Setter Property="HorizontalAlignment" Value="Stretch"/><Setter Property="VerticalAlignment" Value="Stretch"/></Style>
     <Style Selector="Button.key:pointerover"><Setter Property="Background" Value="#E1E8F4"/></Style>
     <Style Selector="Button.key:pressed"><Setter Property="Background" Value="#D2DDEE"/></Style>
     <Style Selector="Button.operator"><Setter Property="Background" Value="#E8EEF8"/><Setter Property="Foreground" Value="#31599E"/><Setter Property="FontSize" Value="21"/></Style>
@@ -19,7 +19,7 @@
       </Grid>
     </Border>
     <Border Grid.Row="1" Background="White" CornerRadius="18" Padding="20" Margin="0,0,16,0">
-      <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto">
+      <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto,Auto">
         <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" Margin="0,0,0,12">
           <TextBlock Text="{Binding Expression}" VerticalAlignment="Center" Foreground="#8A96A9" FontSize="14" TextTrimming="CharacterEllipsis"/>
           <Button Grid.Column="1" Content="Undo" Tag="Undo" Click="OnButtonClick" Classes="tool" ToolTip.Tip="Отменить последнее действие (Ctrl+Z)" Margin="4,0"/>
@@ -31,14 +31,16 @@
           <TextBlock Text="{Binding Display}" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="50" FontWeight="Light" Foreground="#19263B" TextTrimming="CharacterEllipsis"/>
         </Border>
         <TextBlock Grid.Row="2" Text="{Binding ModeLabel, StringFormat='{}{0} клавиши'}" FontSize="12" FontWeight="SemiBold" Foreground="#8793A6" Margin="4,0,0,4"/>
-        <ItemsControl Grid.Row="3" ItemsSource="{Binding CurrentRows}">
-          <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="6"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-          <ItemsControl.ItemTemplate><DataTemplate>
-            <Button Content="{Binding}" Tag="{Binding}" Click="OnButtonClick" Classes="key" Width="68" Height="54" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip.Tip="Выполнить команду калькулятора" AutomationProperties.Name="{Binding}"/>
-          </DataTemplate></ItemsControl.ItemTemplate>
+        <ItemsControl Grid.Row="3" ItemsSource="{Binding ScientificFunctions}" IsVisible="{Binding ShowScientific}" Margin="0,0,0,4">
+          <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="5"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate><DataTemplate><Button Content="{Binding}" Tag="{Binding}" Click="OnButtonClick" Classes="key" MinHeight="42" FontSize="14" ToolTip.Tip="Научная функция" AutomationProperties.Name="{Binding}"/></DataTemplate></ItemsControl.ItemTemplate>
         </ItemsControl>
-        <Border Grid.Row="4" Background="#FFF0EE" CornerRadius="10" Padding="10" IsVisible="{Binding HasError}" Margin="4,8"><TextBlock Text="{Binding Error}" Foreground="#A72D20" TextWrapping="Wrap"/></Border>
-        <Grid Grid.Row="5" ColumnDefinitions="*,*,*" Margin="0,4,0,0">
+        <ItemsControl Grid.Row="4" ItemsSource="{Binding KeypadRows}">
+          <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="4"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate><DataTemplate><Button Content="{Binding}" Tag="{Binding}" Click="OnButtonClick" Classes="key" ToolTip.Tip="Выполнить команду калькулятора" AutomationProperties.Name="{Binding}"/></DataTemplate></ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <Border Grid.Row="5" Background="#FFF0EE" CornerRadius="10" Padding="10" IsVisible="{Binding HasError}" Margin="4,8"><TextBlock Text="{Binding Error}" Foreground="#A72D20" TextWrapping="Wrap"/></Border>
+        <Grid Grid.Row="6" ColumnDefinitions="*,*,*" Margin="0,4,0,0">
           <Button Content="Сохранить историю" Tag="Сохранить историю" Click="OnButtonClick" Classes="tool" HorizontalAlignment="Stretch" Margin="4"/>
           <Button Grid.Column="1" Content="Загрузить" Tag="Загрузить историю" Click="OnButtonClick" Classes="tool" HorizontalAlignment="Stretch" Margin="4"/>
           <Button Grid.Column="2" Content="Очистить историю" Tag="Очистить историю" Click="OnButtonClick" Classes="tool" HorizontalAlignment="Stretch" Margin="4"/>
