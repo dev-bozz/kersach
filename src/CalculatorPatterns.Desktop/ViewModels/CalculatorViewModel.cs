@@ -145,13 +145,13 @@ public sealed class CalculatorViewModel : INotifyPropertyChanged
     private async Task SaveHistoryAsync()
     {
         if (_topLevel?.StorageProvider is not { } storage) return;
-        var file = await storage.SaveFilePickerAsync(new FilePickerSaveOptions { Title = "Сохранить историю", SuggestedFileName = "calculator-history.json", FileTypeChoices = [new("JSON", ["json"])] });
+        var file = await storage.SaveFilePickerAsync(new FilePickerSaveOptions { Title = "Сохранить историю", SuggestedFileName = "calculator-history.json", FileTypeChoices = [new FilePickerFileType("JSON") { Patterns = ["*.json"] }] });
         if (file is not null) try { await _store.SaveAsync(file.Path.LocalPath, _model.History); SetError(""); } catch (Exception ex) { SetError("Не удалось сохранить историю: " + ex.Message); }
     }
     private async Task LoadHistoryAsync()
     {
         if (_topLevel?.StorageProvider is not { } storage) return;
-        var files = await storage.OpenFilePickerAsync(new FilePickerOpenOptions { Title = "Загрузить историю", AllowMultiple = false, FileTypeFilter = [new("JSON", ["json"])] });
+        var files = await storage.OpenFilePickerAsync(new FilePickerOpenOptions { Title = "Загрузить историю", AllowMultiple = false, FileTypeFilter = [new FilePickerFileType("JSON") { Patterns = ["*.json"] }] });
         if (files.Count == 0) return;
         try { _model.ReplaceHistory(await _store.LoadAsync(files[0].Path.LocalPath)); await SaveDefaultAsync(); SetError(""); } catch (Exception ex) { SetError("Не удалось загрузить историю: " + ex.Message); }
     }
