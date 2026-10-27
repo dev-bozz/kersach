@@ -36,9 +36,10 @@ public sealed class CalculatorViewModel : INotifyPropertyChanged
     public string ModeLabel { get => _modeLabel; private set => Set(ref _modeLabel, value); }
     public string AngleLabel { get => _angleLabel; private set => Set(ref _angleLabel, value); }
     public ObservableCollection<CalculationRecord> History { get; } = [];
-    public IReadOnlyList<string> Rows => ["sin", "cos", "tan", "ln", "log10", "√x", "x²", "xʸ", "1/x", "(", ")", "π", "e", "±", "%", "CE", "C", "⌫", "÷", "7", "8", "9", "×", "4", "5", "6", "−", "1", "2", "3", "+", "0", ",", "=", "DEG/RAD", "Стандартный/Научный", "Undo", "Redo", "Сохранить историю", "Загрузить историю", "Очистить историю"];
-    public IReadOnlyList<string> StandardRows => ["±", "%", "CE", "C", "⌫", "÷", "7", "8", "9", "×", "4", "5", "6", "−", "1", "2", "3", "+", "0", ",", "=", "DEG/RAD", "Стандартный/Научный", "Undo", "Redo", "Сохранить историю", "Загрузить историю", "Очистить историю"];
+    public IReadOnlyList<string> Rows => ["sin", "cos", "tan", "ln", "log10", "√x", "x²", "xʸ", "1/x", "(", ")", "π", "e", "±", "%", "CE", "C", "⌫", "÷", "7", "8", "9", "×", "4", "5", "6", "−", "1", "2", "3", "+", "0", ",", "="];
+    public IReadOnlyList<string> StandardRows => ["±", "%", "CE", "C", "⌫", "÷", "7", "8", "9", "×", "4", "5", "6", "−", "1", "2", "3", "+", "0", ",", "="];
     public IReadOnlyList<string> ScientificRows => Rows;
+    public string AngleButtonLabel => _state.AngleMode == AngleMode.Degrees ? "DEG  ▾" : "RAD  ▾";
     public IReadOnlyList<string> CurrentRows => _state.CalculatorMode == CalculatorMode.Standard ? StandardRows : ScientificRows;
     public CalculatorViewModel(CalculatorModel model, CalculatorController controller, IOperationFactory factory, IHistoryStore store)
     {
@@ -69,8 +70,8 @@ public sealed class CalculatorViewModel : INotifyPropertyChanged
                 case "⌫": Backspace(); break;
                 case "±": _input = _input.StartsWith('-') ? _input[1..] : _input == "0" ? "0" : "-" + _input; SyncDisplay(); break;
                 case "%": ApplyPercent(); break;
-                case "DEG/RAD": _state.AngleMode = _state.AngleMode == AngleMode.Degrees ? AngleMode.Radians : AngleMode.Degrees; Publish(); break;
-                case "Стандартный/Научный": SwitchMode(); break;
+                case "DEG/RAD": case "DEG  ▾": case "RAD  ▾": _state.AngleMode = _state.AngleMode == AngleMode.Degrees ? AngleMode.Radians : AngleMode.Degrees; PropertyChanged?.Invoke(this, new(nameof(AngleButtonLabel))); Publish(); break;
+                case "Стандартный/Научный": case "Режим": SwitchMode(); break;
                 case "Undo": Undo(); break; case "Redo": Redo(); break;
                 case "Сохранить историю": _ = SaveHistoryAsync(); break; case "Загрузить историю": _ = LoadHistoryAsync(); break;
                 case "Очистить историю": _model.ReplaceHistory([]); _ = SaveDefaultAsync(); break;

@@ -1,18 +1,58 @@
-<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="CalculatorPatterns.Desktop.Views.MainWindow" Title="Калькулятор — паттерны проектирования" Width="1100" Height="760" MinWidth="950" MinHeight="650" Background="#F3F5F9">
-  <Grid ColumnDefinitions="2*,1*" RowDefinitions="Auto,*" Margin="22">
-    <Border Grid.ColumnSpan="2" Background="#FFFFFF" CornerRadius="16" Padding="18" Margin="0,0,0,16">
-      <Grid ColumnDefinitions="*,Auto,Auto"><StackPanel><TextBlock Text="КАЛЬКУЛЯТОР" FontSize="13" Foreground="#65718A"/><TextBlock Text="Проектирование с паттернами" FontSize="23" FontWeight="SemiBold" Foreground="#17233B"/></StackPanel><Border Grid.Column="1" Background="#E9EEFA" CornerRadius="10" Padding="12,8" Margin="8,0"><TextBlock Text="{Binding ModeLabel}" FontWeight="SemiBold" Foreground="#294F9D"/></Border><Border Grid.Column="2" Background="#E9EEFA" CornerRadius="10" Padding="12,8"><TextBlock Text="{Binding AngleLabel}" FontWeight="SemiBold" Foreground="#294F9D"/></Border></Grid>
-    </Border>
-    <Border Grid.Row="1" Background="White" CornerRadius="16" Padding="18" Margin="0,0,14,0">
-      <Grid RowDefinitions="Auto,Auto,*,Auto">
-        <TextBlock Text="{Binding Expression}" HorizontalAlignment="Right" Foreground="#73809A" FontSize="18" TextTrimming="CharacterEllipsis"/>
-        <TextBlock Grid.Row="1" Text="{Binding Display}" HorizontalAlignment="Right" FontSize="52" FontWeight="Light" Foreground="#17233B" Margin="0,4,0,10" TextTrimming="CharacterEllipsis"/>
-        <ItemsControl Grid.Row="2" ItemsSource="{Binding CurrentRows}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="6"/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate><Button Content="{Binding}" Tag="{Binding}" Click="OnButtonClick" Margin="4" MinHeight="48" FontSize="16" CornerRadius="9" Background="#F0F3F9" Foreground="#26344F" ToolTip.Tip="Выполнить команду калькулятора" AutomationProperties.Name="{Binding}"/></DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
-        <Border Grid.Row="3" Background="#FFF0EE" CornerRadius="8" Padding="10" IsVisible="{Binding HasError}" Margin="4,8,4,0"><TextBlock Text="{Binding Error}" Foreground="#A72D20" TextWrapping="Wrap"/></Border>
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="CalculatorPatterns.Desktop.Views.MainWindow" Title="Калькулятор" Width="1120" Height="760" MinWidth="950" MinHeight="650" Background="#F4F6FA">
+  <Window.Styles>
+    <Style Selector="Button.key"><Setter Property="Height" Value="54"/><Setter Property="Margin" Value="4"/><Setter Property="CornerRadius" Value="13"/><Setter Property="FontSize" Value="17"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Background" Value="#F0F3F8"/><Setter Property="Foreground" Value="#29364D"/><Setter Property="BorderThickness" Value="0"/><Setter Property="Padding" Value="8"/></Style>
+    <Style Selector="Button.key:pointerover"><Setter Property="Background" Value="#E1E8F4"/></Style>
+    <Style Selector="Button.key:pressed"><Setter Property="Background" Value="#D2DDEE"/></Style>
+    <Style Selector="Button.operator"><Setter Property="Background" Value="#E8EEF8"/><Setter Property="Foreground" Value="#31599E"/><Setter Property="FontSize" Value="21"/></Style>
+    <Style Selector="Button.equals"><Setter Property="Background" Value="#3869C8"/><Setter Property="Foreground" Value="White"/><Setter Property="FontSize" Value="22"/></Style>
+    <Style Selector="Button.equals:pointerover"><Setter Property="Background" Value="#2D58AD"/></Style>
+    <Style Selector="Button.utility"><Setter Property="Background" Value="#F7E9E7"/><Setter Property="Foreground" Value="#A4493F"/></Style>
+    <Style Selector="Button.tool"><Setter Property="Height" Value="38"/><Setter Property="Padding" Value="12,6"/><Setter Property="CornerRadius" Value="10"/><Setter Property="Background" Value="#EEF2F8"/><Setter Property="Foreground" Value="#46546D"/><Setter Property="BorderThickness" Value="0"/></Style>
+    <Style Selector="Button.tool:pointerover"><Setter Property="Background" Value="#DCE5F2"/></Style>
+  </Window.Styles>
+  <Grid ColumnDefinitions="*,330" RowDefinitions="Auto,*" Margin="24">
+    <Border Grid.ColumnSpan="2" Background="White" CornerRadius="18" Padding="20" Margin="0,0,0,18">
+      <Grid ColumnDefinitions="*,Auto,Auto" VerticalAlignment="Center">
+        <StackPanel Spacing="2"><TextBlock Text="КАЛЬКУЛЯТОР" FontSize="11" FontWeight="Bold" Foreground="#8190A7"/><TextBlock Text="Вычисления" FontSize="24" FontWeight="SemiBold" Foreground="#1D2A40"/></StackPanel>
+        <Border Grid.Column="1" Background="#EFF3FA" CornerRadius="11" Padding="12,8" Margin="6,0"><TextBlock Text="{Binding ModeLabel}" FontWeight="SemiBold" Foreground="#31599E"/></Border>
+        <Border Grid.Column="2" Background="#EFF3FA" CornerRadius="11" Padding="12,8"><TextBlock Text="{Binding AngleLabel}" FontWeight="SemiBold" Foreground="#31599E"/></Border>
       </Grid>
     </Border>
-    <Border Grid.Column="1" Grid.Row="1" Background="White" CornerRadius="16" Padding="16">
-      <Grid RowDefinitions="Auto,Auto,*"><TextBlock Text="История вычислений" FontSize="20" FontWeight="SemiBold" Foreground="#17233B"/><TextBlock Grid.Row="1" Text="Выберите запись, чтобы вернуть выражение" FontSize="12" Foreground="#7A869D" Margin="0,4,0,10"/><ListBox Grid.Row="2" ItemsSource="{Binding History}" SelectionChanged="OnHistorySelectionChanged"><ListBox.ItemTemplate><DataTemplate><Border Padding="8,10" BorderBrush="#E8ECF3" BorderThickness="0,0,0,1"><StackPanel><TextBlock Text="{Binding Expression}" Foreground="#75819A" FontSize="13"/><TextBlock Text="{Binding Result}" Foreground="#26344F" FontSize="20" FontWeight="SemiBold"/><TextBlock Text="{Binding Timestamp, StringFormat='{}{0:dd.MM.yyyy HH:mm:ss}'}" Foreground="#9AA4B5" FontSize="11"/></StackPanel></Border></DataTemplate></ListBox.ItemTemplate></ListBox></Grid>
+    <Border Grid.Row="1" Background="White" CornerRadius="18" Padding="20" Margin="0,0,16,0">
+      <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto">
+        <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" Margin="0,0,0,12">
+          <TextBlock Text="{Binding Expression}" VerticalAlignment="Center" Foreground="#8A96A9" FontSize="14" TextTrimming="CharacterEllipsis"/>
+          <Button Grid.Column="1" Content="Undo" Tag="Undo" Click="OnButtonClick" Classes="tool" ToolTip.Tip="Отменить последнее действие (Ctrl+Z)" Margin="4,0"/>
+          <Button Grid.Column="2" Content="Redo" Tag="Redo" Click="OnButtonClick" Classes="tool" ToolTip.Tip="Повторить отменённое действие (Ctrl+Y)" Margin="4,0"/>
+          <Button Grid.Column="3" Content="{Binding AngleButtonLabel}" Tag="DEG/RAD" Click="OnButtonClick" Classes="tool" ToolTip.Tip="Переключить градусы и радианы" Margin="4,0"/>
+          <Button Grid.Column="4" Content="Сменить режим" Tag="Режим" Click="OnButtonClick" Classes="tool" ToolTip.Tip="Переключить стандартный и научный режим" Margin="4,0"/>
+        </Grid>
+        <Border Grid.Row="1" Background="#F8FAFD" CornerRadius="14" Padding="18,10" Margin="0,0,0,14">
+          <TextBlock Text="{Binding Display}" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="50" FontWeight="Light" Foreground="#19263B" TextTrimming="CharacterEllipsis"/>
+        </Border>
+        <TextBlock Grid.Row="2" Text="{Binding ModeLabel, StringFormat='{}{0} клавиши'}" FontSize="12" FontWeight="SemiBold" Foreground="#8793A6" Margin="4,0,0,4"/>
+        <ItemsControl Grid.Row="3" ItemsSource="{Binding CurrentRows}">
+          <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="6"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate><DataTemplate>
+            <Button Content="{Binding}" Tag="{Binding}" Click="OnButtonClick" Classes="key" ToolTip.Tip="Выполнить команду калькулятора" AutomationProperties.Name="{Binding}"/>
+          </DataTemplate></ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <Border Grid.Row="4" Background="#FFF0EE" CornerRadius="10" Padding="10" IsVisible="{Binding HasError}" Margin="4,8"><TextBlock Text="{Binding Error}" Foreground="#A72D20" TextWrapping="Wrap"/></Border>
+        <Grid Grid.Row="5" ColumnDefinitions="*,*,*" Margin="0,4,0,0">
+          <Button Content="Сохранить историю" Tag="Сохранить историю" Click="OnButtonClick" Classes="tool" HorizontalAlignment="Stretch" Margin="4"/>
+          <Button Grid.Column="1" Content="Загрузить" Tag="Загрузить историю" Click="OnButtonClick" Classes="tool" HorizontalAlignment="Stretch" Margin="4"/>
+          <Button Grid.Column="2" Content="Очистить историю" Tag="Очистить историю" Click="OnButtonClick" Classes="tool" HorizontalAlignment="Stretch" Margin="4"/>
+        </Grid>
+      </Grid>
+    </Border>
+    <Border Grid.Column="1" Grid.Row="1" Background="White" CornerRadius="18" Padding="18">
+      <Grid RowDefinitions="Auto,Auto,*">
+        <Grid ColumnDefinitions="*,Auto"><StackPanel><TextBlock Text="История" FontSize="20" FontWeight="SemiBold" Foreground="#1D2A40"/><TextBlock Text="Последние вычисления" FontSize="12" Foreground="#8A96A9" Margin="0,3,0,0"/></StackPanel><Border Grid.Column="1" Background="#EFF3FA" CornerRadius="9" Padding="9,5" VerticalAlignment="Center"><TextBlock Text="{Binding History.Count}" Foreground="#53627A" FontSize="12"/></Border></Grid>
+        <Border Grid.Row="1" Height="1" Background="#E9EDF3" Margin="0,14,0,4"/>
+        <ListBox Grid.Row="2" ItemsSource="{Binding History}" SelectionChanged="OnHistorySelectionChanged" Background="Transparent" BorderThickness="0" Padding="0">
+          <ListBox.ItemTemplate><DataTemplate><Border Padding="11,12" Margin="0,4" Background="#F8FAFD" CornerRadius="11"><StackPanel Spacing="3"><TextBlock Text="{Binding Expression}" Foreground="#7D899C" FontSize="12" TextTrimming="CharacterEllipsis"/><TextBlock Text="{Binding Result}" Foreground="#24334C" FontSize="21" FontWeight="SemiBold"/><TextBlock Text="{Binding Timestamp, StringFormat='{}{0:dd.MM.yyyy  HH:mm}'}" Foreground="#9AA5B5" FontSize="11"/></StackPanel></Border></DataTemplate></ListBox.ItemTemplate>
+        </ListBox>
+      </Grid>
     </Border>
   </Grid>
 </Window>
