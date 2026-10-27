@@ -134,7 +134,19 @@ public sealed class CalculatorViewModel : INotifyPropertyChanged
     private static string Format(double value) => value.ToString("G15", CultureInfo.InvariantCulture);
     private void Publish() { _state.Input = _input; _state.Display = _input; _model.Update(_state.Display, _state.Expression, HasError ? Error : null, _state.CalculatorMode, _state.AngleMode); }
     private void SetError(string message) { Error = message; HasError = message.Length > 0; }
-    private void OnModelChanged(object? sender, CalculatorChangedEventArgs args) { Display = args.Display.Replace('.', ','); Expression = args.Expression; Error = args.ErrorMessage ?? ""; HasError = Error.Length > 0; ModeLabel = args.Mode == CalculatorMode.Standard ? "Стандартный" : "Научный"; AngleLabel = args.AngleMode == AngleMode.Degrees ? "DEG" : "RAD"; History.Clear(); foreach (var record in args.History) History.Add(record); }
+    private void OnModelChanged(object? sender, CalculatorChangedEventArgs args)
+    {
+        Display = args.Display.Replace('.', ','); Expression = args.Expression;
+        Error = args.ErrorMessage ?? ""; HasError = Error.Length > 0;
+        ModeLabel = args.Mode == CalculatorMode.Standard ? "Стандартный" : "Научный";
+        AngleLabel = args.AngleMode == AngleMode.Degrees ? "DEG" : "RAD";
+        PropertyChanged?.Invoke(this, new(nameof(AngleButtonLabel)));
+        if (!History.SequenceEqual(args.History))
+        {
+            History.Clear();
+            foreach (var record in args.History) History.Add(record);
+        }
+    }
     public void SelectHistory(CalculationRecord? record) { if (record is null) return; Capture(); _state.Expression = record.Expression.Replace(" =", ""); _input = record.Result; _state.Display = _input; _state.IsNewEntry = true; Publish(); }
     public void HandleKey(string key, bool control = false, bool shift = false)
     {
