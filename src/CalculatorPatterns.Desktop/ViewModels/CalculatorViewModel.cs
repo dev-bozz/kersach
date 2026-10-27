@@ -147,7 +147,38 @@ public sealed class CalculatorViewModel : INotifyPropertyChanged
             foreach (var record in args.History) History.Add(record);
         }
     }
-    public void SelectHistory(CalculationRecord? record) { if (record is null) return; Capture(); _state.Expression = record.Expression.Replace(" =", ""); _input = record.Result; _state.Display = _input; _state.IsNewEntry = true; Publish(); }
+    public void SelectHistory(CalculationRecord? record)
+    {
+        if (record is null) return;
+        try
+        {
+            // A history selection is a calculator edit, but it must not mutate the
+            // bound history collection while ListBox is processing selection.
+            Capture();
+            if (!double.TryParse(record.Result.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out var result) || !double.IsFinite(result))
+                throw new FormatException("В записи истории содержится некорректный результат.");
+            _input = Format(result);
+            _state.Display = _input;
+            _state.Input = _input;
+            _state.Expression = record.Expression.EndsWith(" =", StringComparison.Ordinal) ? record.Expression[..^2] : record.Expression;
+            _state.PendingOperator = null;
+            _state.LeftOperand = null;
+            _state.IsNewEntry = true;
+            _lastOperator = null;
+            _lastRight = null;
+            SetError("");
+            // Update display bindings directly; do not publish a domain event that
+            // causes the history ListBox to be refreshed during its selection event.
+            Display = _input.Replace('.', ',');
+            Expression = _state.Expression;
+            Error = "";
+            HasError = false;
+        }
+        catch (Exception ex)
+        {
+            SetError("Не удалось открыть запись истории: " + ex.Message);
+        }
+    }
     public void HandleKey(string key, bool control = false, bool shift = false)
     {
         if (control && key.Equals("z", StringComparison.OrdinalIgnoreCase)) { Invoke(shift ? "Redo" : "Undo"); return; }

@@ -15,7 +15,7 @@ public partial class MainWindow : Window
     }
     private void OnHistorySelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (sender is ListBox { SelectedItem: CalculationRecord record } && DataContext is CalculatorViewModel vm)
+        if (sender is ListBox list && list.SelectedItem is CalculationRecord record && DataContext is CalculatorViewModel vm)
             vm.SelectHistory(record);
     }
     protected override void OnKeyDown(KeyEventArgs e)
