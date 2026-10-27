@@ -37,7 +37,7 @@ public sealed class CalculatorViewModel : INotifyPropertyChanged
     public string AngleLabel { get => _angleLabel; private set => Set(ref _angleLabel, value); }
     public ObservableCollection<CalculationRecord> History { get; } = [];
     public IReadOnlyList<string> Rows => ["sin", "cos", "tan", "ln", "log10", "√x", "x²", "xʸ", "1/x", "(", ")", "π", "e", "±", "%", "CE", "C", "⌫", "÷", "7", "8", "9", "×", "4", "5", "6", "−", "1", "2", "3", "+", "0", ",", "="];
-    public IReadOnlyList<string> StandardRows => ["±", "%", "CE", "C", "⌫", "÷", "7", "8", "9", "×", "4", "5", "6", "−", "1", "2", "3", "+", "0", ",", "="];
+    public IReadOnlyList<string> StandardRows => ["±", "%", "CE", "⌫", "7", "8", "9", "÷", "4", "5", "6", "×", "1", "2", "3", "−", "0", ",", "C", "+", "="];
     public IReadOnlyList<string> ScientificRows => Rows;
     public string AngleButtonLabel => _state.AngleMode == AngleMode.Degrees ? "DEG  ▾" : "RAD  ▾";
     public IReadOnlyList<string> CurrentRows => _state.CalculatorMode == CalculatorMode.Standard ? StandardRows : ScientificRows;
